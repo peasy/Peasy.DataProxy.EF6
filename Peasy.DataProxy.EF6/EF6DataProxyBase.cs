@@ -1,7 +1,10 @@
 ﻿using AutoMapper;
+using Peasy;
 using Peasy.Core;
+using Peasy.Exception;
 using System.Collections.Generic;
 using System.Data.Entity;
+using System.Data.Entity.Infrastructure;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -29,65 +32,61 @@ namespace Orders.com.DAL.EF
         {
             using (var context = GetDbContext())
             {
-                OnBeforeGetByIDExecuted(context);
+                OnBeforeGetByIDExecuted(context, id);
                 var data = context.Set<T>().Find(id);
-                var mapped = Mapper.Map<T>(data);
-                OnAfterGetByIDExecuted(context, mapped);
-                return mapped;
+                OnAfterGetByIDExecuted(context, data);
+                return Mapper.Map<T>(data);
             }
         }
 
-        protected virtual void OnBeforeGetByIDExecuted(DbContext context) { }
+        protected virtual void OnBeforeGetByIDExecuted(DbContext context, TKey id) { }
         protected virtual void OnAfterGetByIDExecuted(DbContext context, T result) { }
 
         public virtual T Insert(T entity)
         {
             using (var context = GetDbContext())
             {
-                OnBeforeInsertExecuted(context);
                 var data = Mapper.Map(entity, default(T));
                 context.Set<T>().Add(data);
+                OnBeforeInsertExecuted(context, data);
                 context.SaveChanges();
-                entity.ID = data.ID;
                 OnAfterInsertExecuted(context, entity);
-                return entity;
+                return Mapper.Map(data, entity);
             }
         }
 
-        protected virtual void OnBeforeInsertExecuted(DbContext context) { }
+        protected virtual void OnBeforeInsertExecuted(DbContext context, T entity) { }
         protected virtual void OnAfterInsertExecuted(DbContext context, T result) { }
 
         public virtual T Update(T entity)
         {
             using (var context = GetDbContext())
             {
-                OnBeforeUpdateExecuted(context);
                 var data = Mapper.Map(entity, default(T));
                 context.Entry<T>(data).State = EntityState.Modified;
+                OnBeforeUpdateExecuted(context, data);
                 context.SaveChanges();
-                entity = Mapper.Map(data, entity);
-                OnAfterUpdateExecuted(context, entity);
-                return entity;
+                OnAfterUpdateExecuted(context, data);
+                return Mapper.Map(data, entity);
             }
         }
 
-        protected virtual void OnBeforeUpdateExecuted(DbContext context) { }
+        protected virtual void OnBeforeUpdateExecuted(DbContext context, T entity) { }
         protected virtual void OnAfterUpdateExecuted(DbContext context, T result) { }
 
         public virtual void Delete(TKey id)
         {
             using (var context = GetDbContext())
             {
-                OnBeforeDeleteExecuted(context);
-                var entity = new T();
-                entity.ID = id;
+                var entity = new T() { ID = id };
                 context.Entry<T>(entity).State = EntityState.Deleted;
+                OnBeforeDeleteExecuted(context, id);
                 context.SaveChanges();
                 OnAfterDeleteExecuted(context);
             }
         }
 
-        protected virtual void OnBeforeDeleteExecuted(DbContext context) { }
+        protected virtual void OnBeforeDeleteExecuted(DbContext context, TKey id) { }
         protected virtual void OnAfterDeleteExecuted(DbContext context) { }
 
         public virtual async Task<IEnumerable<T>> GetAllAsync()
@@ -96,9 +95,8 @@ namespace Orders.com.DAL.EF
             {
                 await OnBeforeGetAllAsyncExecuted(context);
                 var data = await context.Set<T>().ToListAsync();
-                var mapped = data.Select(Mapper.Map<T, T>).ToArray();
-                await OnAfterGetAllAsyncExecuted(context, mapped);
-                return mapped;
+                await OnAfterGetAllAsyncExecuted(context, data);
+                return data.Select(Mapper.Map<T, T>).ToArray();
             }
         }
 
@@ -109,65 +107,69 @@ namespace Orders.com.DAL.EF
         {
             using (var context = GetDbContext())
             {
-                await OnBeforeGetByIDExecutedAsync(context);
+                await OnBeforeGetByIDExecutedAsync(context, id);
                 var data = await context.Set<T>().FindAsync(id);
-                var mapped = Mapper.Map<T>(data);
-                await OnAfterGetByIDExecutedAsync(context, mapped);
-                return mapped;
+                await OnAfterGetByIDExecutedAsync(context, data);
+                return Mapper.Map<T>(data);
             }
         }
 
-        protected virtual async Task OnBeforeGetByIDExecutedAsync(DbContext context) { }
+        protected virtual async Task OnBeforeGetByIDExecutedAsync(DbContext context, TKey id) { }
         protected virtual async Task OnAfterGetByIDExecutedAsync(DbContext context, T result) { }
 
         public virtual async Task<T> InsertAsync(T entity)
         {
             using (var context = GetDbContext())
             {
-                await OnBeforeInsertExecutedAsync(context);
                 var data = Mapper.Map(entity, default(T));
                 context.Set<T>().Add(data);
+                await OnBeforeInsertExecutedAsync(context, data);
                 await context.SaveChangesAsync();
-                entity.ID = data.ID;
-                await OnAfterInsertExecutedAsync(context, entity);
-                return entity;
+                await OnAfterInsertExecutedAsync(context, data);
+                return Mapper.Map(data, entity);
             }
         }
 
-        protected virtual async Task OnBeforeInsertExecutedAsync(DbContext context) { }
+        protected virtual async Task OnBeforeInsertExecutedAsync(DbContext context, T entity) { }
         protected virtual async Task OnAfterInsertExecutedAsync(DbContext context, T result) { }
 
         public virtual async Task<T> UpdateAsync(T entity)
         {
             using (var context = GetDbContext())
             {
-                await OnBeforeUpdateExecutedAsync(context);
-                var data = Mapper.Map(entity, default(T));
-                context.Entry<T>(data).State = EntityState.Modified;
-                await context.SaveChangesAsync();
-                entity = Mapper.Map(data, entity);
-                await OnAfterUpdateExecutedAsync(context, entity);
-                return entity;
+                try
+                {
+                    var data = Mapper.Map(entity, default(T));
+                    context.Entry<T>(data).State = EntityState.Modified;
+                    await OnBeforeUpdateExecutedAsync(context, data);
+                    await context.SaveChangesAsync();
+                    await OnAfterUpdateExecutedAsync(context, data);
+                    return Mapper.Map(data, entity);
+                }
+                catch (DbUpdateConcurrencyException ex) 
+                {
+                    string message = "A concurrency exception occurred";
+                    throw new ConcurrencyException(message, ex);
+                };
             }
         }
 
-        protected virtual async Task OnBeforeUpdateExecutedAsync(DbContext context) { }
+        protected virtual async Task OnBeforeUpdateExecutedAsync(DbContext context, T entity) { }
         protected virtual async Task OnAfterUpdateExecutedAsync(DbContext context, T result) { }
 
         public virtual async Task DeleteAsync(TKey id)
         {
             using (var context = GetDbContext())
             {
-                await OnBeforeDeleteExecutedAsync(context);
-                var entity = new T();
-                entity.ID = id;
+                var entity = new T() { ID = id };
                 context.Entry<T>(entity).State = EntityState.Deleted;
+                await OnBeforeDeleteExecutedAsync(context, id);
                 await context.SaveChangesAsync();
                 await OnAfterDeleteExecutedAsync(context);
             }
         }
 
-        protected virtual async Task OnBeforeDeleteExecutedAsync(DbContext context) { }
+        protected virtual async Task OnBeforeDeleteExecutedAsync(DbContext context, TKey id) { }
         protected virtual async Task OnAfterDeleteExecutedAsync(DbContext context) { }
     }
 }
