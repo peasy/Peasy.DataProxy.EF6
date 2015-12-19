@@ -36,9 +36,9 @@ namespace Orders.com.DAL.EF
             {
                 OnBeforeGetByIDExecuted(context, id);
                 var data = context.Set<TEntity>().Find(id);
-                var mapped = Mapper.Map<DTO>(data);
-                OnAfterGetByIDExecuted(context, mapped);
-                return mapped; 
+                var result = Mapper.Map<DTO>(data);
+                OnAfterGetByIDExecuted(context, result);
+                return result; 
             }
         }
 
@@ -53,9 +53,9 @@ namespace Orders.com.DAL.EF
                 context.Set<TEntity>().Add(data);
                 OnBeforeInsertExecuted(context, data);
                 context.SaveChanges();
-                var mapped = Mapper.Map(data, entity);
+                var result = Mapper.Map(data, entity);
                 OnAfterInsertExecuted(context, entity);
-                return mapped;
+                return result;
             }
         }
 
@@ -67,12 +67,12 @@ namespace Orders.com.DAL.EF
             using (var context = GetDbContext())
             {
                 var data = Mapper.Map(entity, default(TEntity));
-                context.Entry<TEntity>(data).State = EntityState.Modified;
+                context.Entry(data).State = EntityState.Modified;
                 OnBeforeUpdateExecuted(context, data);
                 context.SaveChanges();
-                var mapped = Mapper.Map(data, entity);
-                OnAfterUpdateExecuted(context, mapped);
-                return mapped; 
+                var result = Mapper.Map(data, entity);
+                OnAfterUpdateExecuted(context, result);
+                return result; 
             }
         }
 
@@ -100,9 +100,9 @@ namespace Orders.com.DAL.EF
             {
                 await OnBeforeGetAllAsyncExecuted(context);
                 var data = await context.Set<TEntity>().ToListAsync();
-                var mapped = data.Select(Mapper.Map<TEntity, DTO>).ToArray();
-                await OnAfterGetAllAsyncExecuted(context, mapped);
-                return mapped;
+                var result = data.Select(Mapper.Map<TEntity, DTO>).ToArray();
+                await OnAfterGetAllAsyncExecuted(context, result);
+                return result;
             }
         }
 
@@ -115,9 +115,9 @@ namespace Orders.com.DAL.EF
             {
                 await OnBeforeGetByIDExecutedAsync(context, id);
                 var data = await context.Set<TEntity>().FindAsync(id);
-                var mapped = Mapper.Map<DTO>(data);
-                await OnAfterGetByIDExecutedAsync(context, mapped);
-                return mapped;
+                var result = Mapper.Map<DTO>(data);
+                await OnAfterGetByIDExecutedAsync(context, result);
+                return result;
             }
         }
 
@@ -132,9 +132,9 @@ namespace Orders.com.DAL.EF
                 context.Set<TEntity>().Add(data);
                 await OnBeforeInsertExecutedAsync(context, data);
                 await context.SaveChangesAsync();
-                var mapped = Mapper.Map(data, entity);
-                await OnAfterInsertExecutedAsync(context, mapped);
-                return mapped;
+                var result = Mapper.Map(data, entity);
+                await OnAfterInsertExecutedAsync(context, result);
+                return result;
             }
         }
 
@@ -151,9 +151,9 @@ namespace Orders.com.DAL.EF
                     context.Entry<TEntity>(data).State = EntityState.Modified;
                     await OnBeforeUpdateExecutedAsync(context, data);
                     await context.SaveChangesAsync();
-                    var mapped = Mapper.Map(data, entity);
-                    await OnAfterUpdateExecutedAsync(context, mapped);
-                    return mapped;
+                    var result = Mapper.Map(data, entity);
+                    await OnAfterUpdateExecutedAsync(context, result);
+                    return result;
                 }
                 catch (DbUpdateConcurrencyException ex) 
                 {
