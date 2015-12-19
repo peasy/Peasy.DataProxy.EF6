@@ -1,22 +1,22 @@
 ![peasy](https://www.dropbox.com/s/2yajr2x9yevvzbm/peasy3.png?dl=0&raw=1)
 
-# Peasy.DataProxy.Http
+# Peasy.DataProxy.EF6
 
-Peasy.DataProxy.Http provides the [HttpServiceProxyBase](https://github.com/peasy/Peasy.DataProxy.Http/blob/master/Peasy.DataProxy.Http/HttpServiceProxyBase.cs) class.  HttpServiceProxyBase is an abstract class that implements [IDataProxy](https://github.com/ahanusa/Peasy.NET/wiki/Data-Proxy), and can be used to very quickly and easily provide a data proxy that communicates with HTTP services via the GET, POST, PUT, and DELETE verbs.
+Peasy.DataProxy.EF6 provides the [EF6DataProxyBase](https://github.com/peasy/Peasy.DataProxy.EF6/blob/master/Peasy.DataProxy.EF6/EF6DataProxyBase.cs) class.  EF6DataProxyBase is an abstract class that implements [IDataProxy](https://github.com/ahanusa/Peasy.NET/wiki/Data-Proxy), and can be used to very quickly and easily provide a data proxy that communicates with a database using Entity Framework [code first](https://msdn.microsoft.com/en-us/data/jj193542.aspx) or [database first](https://msdn.microsoft.com/en-us/data/jj206878.aspx) classes.
 
 ###Where can I get it?
 
-First, install NuGet. Then create a project for your HTTP class implementations to live.  Finally, install Peasy.DataProxy.Http from the package manager console:
+First, install NuGet. Then create a project for your Entity Framework data proxy implementations to live.  Finally, install Peasy.DataProxy.EF6 from the package manager console:
 
-``` PM> Install-Package Peasy.DataProxy.Http ```
+``` PM> Install-Package Peasy.DataProxy.EF6 ```
 
-You can also download and add the Peasy.DataProxy.Http project to your solution and set references where applicable
+You can also download and add the Peasy.DataProxy.EF6 project to your solution and set references where applicable
 
-### Creating a concrete HTTP data proxy
+### Creating a concrete EF6 data proxy
 
-To create an HTTP repository, you must inherit from [HttpServiceProxyBase](https://github.com/peasy/Peasy.DataProxy.Http/blob/master/Peasy.DataProxy.Http/HttpServiceProxyBase.cs).  There is one contractual obligation to fullfill.
+To create an EF6 repository, you must inherit from [EF6DataProxyBase](https://github.com/peasy/Peasy.DataProxy.EF6/blob/master/Peasy.DataProxy.EF6/EF6DataProxyBase.cs).  There is one contractual obligation to fullfill.
 
-1.) Override [RequestUri](https://github.com/peasy/Peasy.DataProxy.Http/blob/master/Peasy.DataProxy.Http/HttpServiceProxyBase.cs#L18) - this property represents the endpoint your proxy implementation will communicate with
+1.) Override [GetDBContext](https://github.com/peasy/Peasy.DataProxy.Http/blob/master/Peasy.DataProxy.Http/HttpServiceProxyBase.cs#L18) - this property represents the endpoint your proxy implementation will communicate with
 
 Here is a sample implementation
 
