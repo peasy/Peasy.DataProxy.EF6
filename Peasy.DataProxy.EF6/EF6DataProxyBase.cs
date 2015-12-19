@@ -1,15 +1,12 @@
-﻿using AutoMapper;
-using Peasy;
-using Peasy.Core;
+﻿using Peasy.Core;
 using Peasy.Exception;
-using System;
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Data.Entity.Infrastructure;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Peasy.DataProxy.EF6 
+namespace Peasy.DataProxy.EF6
 {
     public abstract class EF6DataProxyBase<DTO, TEntity, TKey> : IDataProxy<DTO, TKey> where DTO : class, IDomainObject<TKey>, new()
                                                                                        where TEntity : class, IDomainObject<TKey>, new()
