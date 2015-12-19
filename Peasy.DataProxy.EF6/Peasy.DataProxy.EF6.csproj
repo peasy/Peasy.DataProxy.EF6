@@ -63,7 +63,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AutoMapperHelper.cs" />
     <Compile Include="EF6DataProxyBase.cs" />
+    <Compile Include="IMapper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

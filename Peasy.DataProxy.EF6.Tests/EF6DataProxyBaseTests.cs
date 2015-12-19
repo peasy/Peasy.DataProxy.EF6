@@ -6,7 +6,6 @@ using System.Data.Entity;
 using System.Collections.Generic;
 using System.Linq;
 using Moq.Protected;
-using Orders.com.DAL.EF;
 
 namespace Peasy.DataProxy.EF6.Tests
 {

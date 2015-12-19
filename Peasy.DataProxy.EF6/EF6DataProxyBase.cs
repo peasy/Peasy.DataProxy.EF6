@@ -9,11 +9,22 @@ using System.Data.Entity.Infrastructure;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Orders.com.DAL.EF
+namespace Peasy.DataProxy.EF6 
 {
     public abstract class EF6DataProxyBase<DTO, TEntity, TKey> : IDataProxy<DTO, TKey> where DTO : class, IDomainObject<TKey>, new()
                                                                                        where TEntity : class, IDomainObject<TKey>, new()
     {
+        private static IMapper _mapper = new AutoMapperHelper();
+
+        public EF6DataProxyBase()
+        {
+        }
+
+        public EF6DataProxyBase(IMapper mapper)
+        {
+            _mapper = mapper;
+        }
+
         protected abstract DbContext GetDbContext();
 
         public virtual IEnumerable<DTO> GetAll()
@@ -21,7 +32,7 @@ namespace Orders.com.DAL.EF
             using (var context = GetDbContext())
             {
                 OnBeforeGetAllExecuted(context);
-                var data = context.Set<TEntity>().Select(Mapper.Map<TEntity, DTO>).ToArray();
+                var data = context.Set<TEntity>().Select(_mapper.Map<TEntity, DTO>).ToArray();
                 OnAfterGetAllExecuted(context, data);
                 return data;
             }
@@ -36,7 +47,7 @@ namespace Orders.com.DAL.EF
             {
                 OnBeforeGetByIDExecuted(context, id);
                 var data = context.Set<TEntity>().Find(id);
-                var result = Mapper.Map<DTO>(data);
+                var result = _mapper.Map<TEntity, DTO>(data);
                 OnAfterGetByIDExecuted(context, result);
                 return result; 
             }
@@ -49,11 +60,11 @@ namespace Orders.com.DAL.EF
         {
             using (var context = GetDbContext())
             {
-                var data = Mapper.Map(entity, default(TEntity));
+                var data = _mapper.Map(entity, default(TEntity));
                 context.Set<TEntity>().Add(data);
                 OnBeforeInsertExecuted(context, data);
                 context.SaveChanges();
-                var result = Mapper.Map(data, entity);
+                var result = _mapper.Map(data, entity);
                 OnAfterInsertExecuted(context, entity);
                 return result;
             }
@@ -66,11 +77,11 @@ namespace Orders.com.DAL.EF
         {
             using (var context = GetDbContext())
             {
-                var data = Mapper.Map(entity, default(TEntity));
+                var data = _mapper.Map(entity, default(TEntity));
                 context.Entry(data).State = EntityState.Modified;
                 OnBeforeUpdateExecuted(context, data);
                 context.SaveChanges();
-                var result = Mapper.Map(data, entity);
+                var result = _mapper.Map(data, entity);
                 OnAfterUpdateExecuted(context, result);
                 return result; 
             }
@@ -100,7 +111,7 @@ namespace Orders.com.DAL.EF
             {
                 await OnBeforeGetAllAsyncExecuted(context);
                 var data = await context.Set<TEntity>().ToListAsync();
-                var result = data.Select(Mapper.Map<TEntity, DTO>).ToArray();
+                var result = data.Select(_mapper.Map<TEntity, DTO>).ToArray();
                 await OnAfterGetAllAsyncExecuted(context, result);
                 return result;
             }
@@ -115,7 +126,7 @@ namespace Orders.com.DAL.EF
             {
                 await OnBeforeGetByIDExecutedAsync(context, id);
                 var data = await context.Set<TEntity>().FindAsync(id);
-                var result = Mapper.Map<DTO>(data);
+                var result = _mapper.Map<TEntity, DTO>(data);
                 await OnAfterGetByIDExecutedAsync(context, result);
                 return result;
             }
@@ -128,11 +139,11 @@ namespace Orders.com.DAL.EF
         {
             using (var context = GetDbContext())
             {
-                var data = Mapper.Map(entity, default(TEntity));
+                var data = _mapper.Map(entity, default(TEntity));
                 context.Set<TEntity>().Add(data);
                 await OnBeforeInsertExecutedAsync(context, data);
                 await context.SaveChangesAsync();
-                var result = Mapper.Map(data, entity);
+                var result = _mapper.Map(data, entity);
                 await OnAfterInsertExecutedAsync(context, result);
                 return result;
             }
@@ -147,11 +158,11 @@ namespace Orders.com.DAL.EF
             {
                 try
                 {
-                    var data = Mapper.Map(entity, default(TEntity));
+                    var data = _mapper.Map(entity, default(TEntity));
                     context.Entry<TEntity>(data).State = EntityState.Modified;
                     await OnBeforeUpdateExecutedAsync(context, data);
                     await context.SaveChangesAsync();
-                    var result = Mapper.Map(data, entity);
+                    var result = _mapper.Map(data, entity);
                     await OnAfterUpdateExecutedAsync(context, result);
                     return result;
                 }
