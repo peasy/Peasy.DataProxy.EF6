@@ -76,9 +76,9 @@ Here is an example of providing concurrency logic for an InventoryItemRepository
         var existing = context.Set<InventoryItem>()
                               .FirstOrDefault(e => e.ID.Equals(entity.ID) && e.Version == entity.Version);
         if (existing == null)
-	    throw new ConcurrencyException($"{entity.GetType().Name} with id {entity.ID.ToString()} was already changed");
+            throw new ConcurrencyException($"{entity.GetType().Name} with id {entity.ID.ToString()} was already changed");
 	
-	entity.IncrementVersionByOne();
+        entity.IncrementVersionByOne();
     }
 ```
 
