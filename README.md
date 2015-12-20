@@ -2,7 +2,7 @@
 
 # Peasy.DataProxy.EF6
 
-Peasy.DataProxy.EF6 provides the [EF6DataProxyBase](https://github.com/peasy/Peasy.DataProxy.EF6/blob/master/Peasy.DataProxy.EF6/EF6DataProxyBase.cs) class.  EF6DataProxyBase is an abstract class that implements [IDataProxy](https://github.com/ahanusa/Peasy.NET/wiki/Data-Proxy), and can be used to very quickly and easily provide a data proxy that communicates with a database using Entity Framework [code first](https://msdn.microsoft.com/en-us/data/jj193542.aspx) or [database first](https://msdn.microsoft.com/en-us/data/jj206878.aspx) classes.
+Peasy.DataProxy.EF6 provides the [EF6DataProxyBase](https://github.com/peasy/Peasy.DataProxy.EF6/blob/master/Peasy.DataProxy.EF6/EF6DataProxyBase.cs) class.  EF6DataProxyBase is an abstract class that implements [IDataProxy](https://github.com/ahanusa/Peasy.NET/wiki/Data-Proxy), and can be used to very quickly and easily provide a data proxy that communicates with a database using Entity Framework 6.0.
 
 ###Where can I get it?
 
@@ -62,9 +62,27 @@ In the case that you use a database first approach, you will want to create part
 
 EF6DataProxyBase relies on [Automapper](https://github.com/AutoMapper/AutoMapper) to map DTOs to entities and as a result, if you supply generic constraints of differing types for the DTO and TEntity constraints, you must [provide mappings](https://github.com/AutoMapper/AutoMapper/wiki/Getting-started) in your application to account for this.  If you like, you can always use an alternate mapping tool of your [choice](https://github.com/peasy/Peasy.DataProxy.EF6#mapping-logic).
 
-By simply inheriting from EF6DataProxyBase and overriding GetDbContext, you have a full-blown peasy EF6 data proxy that performs CRUD operations against a database table using Entity Framework 6.0.
+By simply inheriting from EF6DataProxyBase and overriding GetDbContext, you have a full-blown peasy data proxy that performs CRUD operations against a database table using Entity Framework 6.0.
 
 ### Execution hooks
+
+Each EF6 [data proxy]() method gives you an opporunity to perform logic before and after execution of each method via the OnBeforeXYZ and OnAfterXYZ hooks.  These are particularly useful for initializing DTO data, logging, or writing custom concurrency handling logic.
+
+Here is an example of providing concurrency logic for an InventoryItemRepository
+
+```c#
+    protected override void OnBeforeUpdateExecuted(DbContext context, InventoryItem entity)
+    {
+        var existing = context.Set<InventoryItem>()
+                              .FirstOrDefault(e => e.ID.Equals(entity.ID) && e.Version == entity.Version);
+        if (existing == null)
+	    throw new ConcurrencyException($"{entity.GetType().Name} with id {entity.ID.ToString()} was already changed");
+	
+	entity.IncrementVersionByOne();
+    }
+```
+
+In this example, we override OnBeforeUpdateExecuted and ensure that an inventory item with an ID and specific version number exist, either throwing a Concurrency Exception in the scenario where it has changed, or providing our custom version incrementing logic.  A full implementation of this class can be found [here](https://github.com/peasy/Samples/blob/master/Orders.com.DAL.EF/InventoryItemRepository.cs)
 
 ### Mapping Logic
 
