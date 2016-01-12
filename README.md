@@ -86,7 +86,7 @@ In this example, we override OnBeforeUpdateExecuted and ensure that an inventory
 
 ### Mapping Logic
 
-By default, EF6DataProxyBase is configured to use [Automapper](https://github.com/AutoMapper/AutoMapper) to map DTOs to Entities.  However, if you use a different mapping tool by creating a facade (wrapper) class that implements [Peasy.DataProxy.EF6.IMapper](https://github.com/peasy/Peasy.DataProxy.EF6/blob/master/Peasy.DataProxy.EF6/IMapper.cs) and supplying it to the overloaded constructor of EF6DataProxyBase.
+By default, EF6DataProxyBase is configured to use [Automapper](https://github.com/AutoMapper/AutoMapper) to map DTOs to Entities.  However, you can use a different mapping tool by creating a facade (wrapper) class that implements [Peasy.DataProxy.EF6.IMapper](https://github.com/peasy/Peasy.DataProxy.EF6/blob/master/Peasy.DataProxy.EF6/IMapper.cs) and supplying it to the overloaded constructor of EF6DataProxyBase.
 
 Here is a sample implementation of a custom mapper using [Mapster](https://github.com/eswann/Mapster)
 
