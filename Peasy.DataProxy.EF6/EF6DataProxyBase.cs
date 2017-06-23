@@ -1,5 +1,4 @@
-﻿using Peasy.Core;
-using Peasy.Exception;
+﻿using Peasy.Exception;
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Data.Entity.Infrastructure;
@@ -92,7 +91,7 @@ namespace Peasy.DataProxy.EF6
             using (var context = GetDbContext())
             {
                 var entity = new TEntity() { ID = id };
-                context.Entry<TEntity>(entity).State = EntityState.Deleted;
+                context.Entry(entity).State = EntityState.Deleted;
                 OnBeforeDeleteExecuted(context, id);
                 context.SaveChanges();
                 OnAfterDeleteExecuted(context);
