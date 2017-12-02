@@ -4,7 +4,7 @@
 
 Peasy.DataProxy.EF6 provides the [EF6DataProxyBase](https://github.com/peasy/Peasy.DataProxy.EF6/blob/master/Peasy.DataProxy.EF6/EF6DataProxyBase.cs) class.  EF6DataProxyBase is an abstract class that implements [IDataProxy](https://github.com/ahanusa/Peasy.NET/wiki/Data-Proxy), and can be used to very quickly and easily provide a data proxy that communicates with a database using Entity Framework 6.0.
 
-###Where can I get it?
+### Where can I get it?
 
 First, install NuGet. Then create a project for your Entity Framework data proxy implementations to live.  Finally, install Peasy.DataProxy.EF6 from the package manager console:
 
